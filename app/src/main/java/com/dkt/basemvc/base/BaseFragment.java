@@ -1,7 +1,6 @@
 package com.dkt.basemvc.base;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -11,7 +10,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.dkt.basemvc.http.MyHttpCycleContext;
-import com.dkt.basemvc.inter.DialogControl;
+import com.dkt.basemvc.widget.dialog.BaseDialogFragment;
+import com.dkt.basemvc.widget.dialog.DialogFactory;
 
 import butterknife.ButterKnife;
 import cn.finalteam.okhttpfinal.HttpTaskHandler;
@@ -32,6 +32,41 @@ public class BaseFragment extends Fragment implements MyHttpCycleContext {
     public static final int STATE_PRESSNONE = 4;// 正在下拉但还没有到刷新的状态
     public static int mState = STATE_NONE;
 
+    protected BaseActivity mBaseActivity;
+    protected DialogFactory mDialogFactory;
+
+    public BaseDialogFragment.BaseDialogListener getDialogListener() {
+        return mDialogFactory.mListenerHolder.getDialogListener();
+    }
+
+    /**
+     * 清空DialogListenerHolder中的dialog listener
+     */
+    public void clearDialogListener() {
+        mDialogFactory.mListenerHolder.setDialogListener(null);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        mDialogFactory.mListenerHolder.saveDialogListenerKey(outState);
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        mDialogFactory = new DialogFactory(getChildFragmentManager(), savedInstanceState);
+        mDialogFactory.restoreDialogListener(this);
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        if (activity instanceof BaseActivity) {
+            mBaseActivity = (BaseActivity) activity;
+        }
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -46,7 +81,7 @@ public class BaseFragment extends Fragment implements MyHttpCycleContext {
 
     }
 
-    protected int getLayoutId(){
+    protected int getLayoutId() {
         return 0;
     }
 
@@ -58,31 +93,24 @@ public class BaseFragment extends Fragment implements MyHttpCycleContext {
         return this.mInflater.inflate(resId, null);
     }
 
-    protected void hideWaitDialog() {
-        Activity activity = getActivity();
-        if (activity instanceof DialogControl) {
-            ((DialogControl) activity).hideWaitDialog();
+    public void hideWaitDialog() {
+        if (mDialogFactory != null) {
+            mDialogFactory.dissProgressDialog();
         }
     }
 
-    protected ProgressDialog showWaitDialog() {
-        return showWaitDialog("加载中…");
+    public void showWaitDialog(boolean cancelable) {
+        showWaitDialog("加载中...", cancelable);
     }
 
-    protected ProgressDialog showWaitDialog(String message) {
-        Activity activity = getActivity();
-        if (activity instanceof DialogControl) {
-            return ((DialogControl) activity).showWaitDialog(message);
-        }
-        return null;
+    public void showWaitDialog(int resid, boolean cancelable) {
+        showWaitDialog(getString(resid), cancelable);
     }
 
-    protected ProgressDialog showWaitDialog(int resId) {
-        Activity activity = getActivity();
-        if (activity instanceof DialogControl) {
-            return ((DialogControl) activity).showWaitDialog(resId);
+    public void showWaitDialog(String message, boolean cancelable) {
+        if (mDialogFactory != null) {
+            mDialogFactory.showProgressDialog(message, cancelable);
         }
-        return null;
     }
 
     @Override

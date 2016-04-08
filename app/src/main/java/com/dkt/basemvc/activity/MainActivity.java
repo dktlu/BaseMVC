@@ -1,5 +1,6 @@
 package com.dkt.basemvc.activity;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -16,16 +17,18 @@ import com.dkt.basemvc.recyclerview.HeaderAndFooterRecyclerViewAdapter;
 import com.dkt.basemvc.recyclerview.RecyclerViewStateUtils;
 import com.dkt.basemvc.recyclerview.RecyclerViewUtils;
 import com.dkt.basemvc.utils.NetUtils;
+import com.dkt.basemvc.utils.T;
 import com.dkt.basemvc.widget.EmptyLayout;
 import com.dkt.basemvc.widget.HeaderLayout;
 import com.dkt.basemvc.widget.LoadingFooter;
+import com.dkt.basemvc.widget.dialog.ConfirmDialogFragment;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
 import butterknife.Bind;
 
-public class MainActivity extends BaseActivity {
+public class MainActivity extends BaseActivity implements ConfirmDialogFragment.ConfirmDialogListener {
 
     @Bind(R.id.layout_error)
     EmptyLayout layoutError;
@@ -72,6 +75,21 @@ public class MainActivity extends BaseActivity {
         mRecyclerview.setLayoutManager(new LinearLayoutManager(this));
         RecyclerViewUtils.setHeaderView(mRecyclerview, new HeaderLayout(this));
         mRecyclerview.addOnScrollListener(mOnScrollListener);
+
+        adapter.setOnItemClickListener(new HeaderAndFooterRecyclerViewAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position, long id) {
+                showWaitDialog("加载资源中。。。", true);
+            }
+        });
+
+        adapter.setOnItemLongClickListener(new HeaderAndFooterRecyclerViewAdapter.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(View view, int position, long id) {
+                mDialogFactory.showConfirmDialog("activity调起确认框","我是Activity中的确认框",true,MainActivity.this);
+                return false;
+            }
+        });
     }
 
     @Override
@@ -125,6 +143,11 @@ public class MainActivity extends BaseActivity {
                 }
             }
         }.start();
+    }
+
+    @Override
+    public void onClick(DialogInterface dialog, int which) {
+        T.showShort(getApplicationContext(), "点击了Activity调起的确认对话框which" + which);
     }
 
     private class PreviewHandler extends Handler {

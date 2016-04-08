@@ -1,27 +1,44 @@
 package com.dkt.basemvc.base;
 
-import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 
 import com.dkt.basemvc.http.MyHttpCycleContext;
 import com.dkt.basemvc.inter.DialogControl;
 import com.dkt.basemvc.utils.AppManager;
-import com.dkt.basemvc.utils.DialogHelp;
+import com.dkt.basemvc.widget.dialog.BaseDialogFragment;
+import com.dkt.basemvc.widget.dialog.DialogFactory;
 
 import butterknife.ButterKnife;
 import cn.finalteam.okhttpfinal.HttpTaskHandler;
 
 /**
- *
  * Created by Administrator on 2016/4/7.
  */
-public class BaseActivity extends Activity implements DialogControl, MyHttpCycleContext {
+public class BaseActivity extends FragmentActivity implements DialogControl, MyHttpCycleContext {
 
     protected final String HTTP_TASK_KEY = "HttpTaskKey_" + hashCode();
     private boolean isVisible;
-    private ProgressDialog waitDialog;
+
+    protected DialogFactory mDialogFactory;
+
+    public BaseDialogFragment.BaseDialogListener getDialogListener() {
+        return mDialogFactory.mListenerHolder.getDialogListener();
+    }
+
+    /**
+     * 清空DialogListenerHolder中的dialog listener
+     */
+    public void clearDialogListener() {
+        mDialogFactory.mListenerHolder.setDialogListener(null);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        mDialogFactory.mListenerHolder.saveDialogListenerKey(outState);
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -29,7 +46,8 @@ public class BaseActivity extends Activity implements DialogControl, MyHttpCycle
 
         //添加activity到activity管理列表中
         AppManager.getAppManager().addActivity(this);
-
+        mDialogFactory = new DialogFactory(getSupportFragmentManager(), savedInstanceState);
+        mDialogFactory.restoreDialogListener(this);
         onBeforeSetContentLayout();
         if (getLayoutId() != 0) {
             setContentView(getLayoutId());
@@ -62,38 +80,28 @@ public class BaseActivity extends Activity implements DialogControl, MyHttpCycle
 
     @Override
     public void hideWaitDialog() {
-        if (isVisible && waitDialog != null) {
-            try {
-                waitDialog.dismiss();
-                waitDialog = null;
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        if (isVisible && mDialogFactory != null) {
+            mDialogFactory.dissProgressDialog();
         }
     }
 
     @Override
-    public ProgressDialog showWaitDialog() {
-        return showWaitDialog("加载中...");
+    public void showWaitDialog(boolean cancelable) {
+        showWaitDialog("加载中...", cancelable);
     }
 
     @Override
-    public ProgressDialog showWaitDialog(int resid) {
-        return showWaitDialog(getString(resid));
+    public void showWaitDialog(int resid, boolean cancelable) {
+        showWaitDialog(getString(resid), cancelable);
     }
 
     @Override
-    public ProgressDialog showWaitDialog(String message) {
+    public void showWaitDialog(String message, boolean cancelable) {
         if (isVisible) {
-            if (waitDialog == null) {
-                waitDialog = DialogHelp.getWaitDialog(this, message);
-            } else {
-                waitDialog.setMessage(message);
-                waitDialog.show();
+            if (mDialogFactory != null) {
+                mDialogFactory.showProgressDialog(message, cancelable);
             }
-            return waitDialog;
         }
-        return null;
     }
 
     @Override
