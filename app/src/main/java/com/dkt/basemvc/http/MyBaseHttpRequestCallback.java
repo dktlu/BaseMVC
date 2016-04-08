@@ -1,6 +1,7 @@
 package com.dkt.basemvc.http;
 
-import com.ld.tao.lhweather.http.mdel.BaseApiResponse;
+
+import com.dkt.basemvc.http.mdel.BaseApiResponse;
 
 import cn.finalteam.okhttpfinal.BaseHttpRequestCallback;
 

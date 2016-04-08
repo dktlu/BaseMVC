@@ -25,6 +25,13 @@ public class BaseFragment extends Fragment implements MyHttpCycleContext {
     protected final String HTTP_TASK_KEY = "HttpTaskKey_" + hashCode();
     protected LayoutInflater mInflater;
 
+    public static final int STATE_NONE = 0;
+    public static final int STATE_REFRESH = 1;
+    public static final int STATE_LOADMORE = 2;
+    public static final int STATE_NOMORE = 3;
+    public static final int STATE_PRESSNONE = 4;// 正在下拉但还没有到刷新的状态
+    public static int mState = STATE_NONE;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -35,8 +42,12 @@ public class BaseFragment extends Fragment implements MyHttpCycleContext {
         return view;
     }
 
-    private void init(Bundle savedInstanceState) {
+    protected void init(Bundle savedInstanceState) {
 
+    }
+
+    protected int getLayoutId(){
+        return 0;
     }
 
     public boolean onBackPressed() {

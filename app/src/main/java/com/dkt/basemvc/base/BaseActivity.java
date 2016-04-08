@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 
 import com.dkt.basemvc.http.MyHttpCycleContext;
 import com.dkt.basemvc.inter.DialogControl;
@@ -25,8 +24,8 @@ public class BaseActivity extends Activity implements DialogControl, MyHttpCycle
     private ProgressDialog waitDialog;
 
     @Override
-    public void onCreate(Bundle savedInstanceState, PersistableBundle persistentState) {
-        super.onCreate(savedInstanceState, persistentState);
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
         //添加activity到activity管理列表中
         AppManager.getAppManager().addActivity(this);
@@ -35,7 +34,6 @@ public class BaseActivity extends Activity implements DialogControl, MyHttpCycle
         if (getLayoutId() != 0) {
             setContentView(getLayoutId());
         }
-
         //通过注解绑定控件
         ButterKnife.bind(this);
 
@@ -45,16 +43,16 @@ public class BaseActivity extends Activity implements DialogControl, MyHttpCycle
     }
 
     @Override
-    protected void onDestroy() {
+    public void onDestroy() {
         super.onDestroy();
         HttpTaskHandler.getInstance().removeTask(HTTP_TASK_KEY);
     }
 
-    private void init(Bundle savedInstanceState) {
+    protected void init(Bundle savedInstanceState) {
 
     }
 
-    private int getLayoutId() {
+    protected int getLayoutId() {
         return 0;
     }
 
