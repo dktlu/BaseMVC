@@ -37,13 +37,19 @@ public class MainActivity extends BaseActivity implements ConfirmDialogFragment.
 
     private ArrayList<ItemModel> dataList;
 
-    /**服务器端一共多少条数据*/
+    /**
+     * 服务器端一共多少条数据
+     */
     private static final int TOTAL_COUNTER = 64;
 
-    /**每一页展示多少条数据*/
+    /**
+     * 每一页展示多少条数据
+     */
     private static final int REQUEST_COUNT = 10;
 
-    /**已经获取到多少条数据了*/
+    /**
+     * 已经获取到多少条数据了
+     */
     private int mCurrentCounter = 0;
 
     private HeaderAndFooterRecyclerViewAdapter adapter = null;
@@ -86,7 +92,7 @@ public class MainActivity extends BaseActivity implements ConfirmDialogFragment.
         adapter.setOnItemLongClickListener(new HeaderAndFooterRecyclerViewAdapter.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(View view, int position, long id) {
-                mDialogFactory.showConfirmDialog("activity调起确认框","我是Activity中的确认框",true,MainActivity.this);
+                mDialogFactory.showConfirmDialog("activity调起确认框", "我是Activity中的确认框", true, true, MainActivity.this);
                 return false;
             }
         });
@@ -136,7 +142,7 @@ public class MainActivity extends BaseActivity implements ConfirmDialogFragment.
                 }
 
                 //模拟一下网络请求失败的情况
-                if(NetUtils.isConnected(getApplicationContext())) {
+                if (NetUtils.isConnected(getApplicationContext())) {
                     mHandler.sendEmptyMessage(-1);
                 } else {
                     mHandler.sendEmptyMessage(-3);

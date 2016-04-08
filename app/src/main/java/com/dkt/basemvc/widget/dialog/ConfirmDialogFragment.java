@@ -32,14 +32,16 @@ public class ConfirmDialogFragment extends BaseDialogFragment {
      * @param title
      * @param message
      * @param cancelable
+     * @param mIsCustomDialog
      * @return
      */
-    public static ConfirmDialogFragment newInstance(String title, String message, boolean cancelable) {
+    public static ConfirmDialogFragment newInstance(String title, String message, boolean cancelable, boolean mIsCustomDialog) {
         ConfirmDialogFragment instance = new ConfirmDialogFragment();
         Bundle args = new Bundle();
         putTitleParam(args, title);
         putMessageParam(args, message);
         putCancelableParam(args, cancelable);
+        putIsCustomParam(args, mIsCustomDialog);
         instance.setArguments(args);
         return instance;
     }
