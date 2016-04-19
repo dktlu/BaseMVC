@@ -141,7 +141,7 @@ public class MainActivity extends BaseActivity implements ConfirmDialogFragment.
                     e.printStackTrace();
                 }
 
-                //模拟一下网络请求失败的情况
+                //模拟一下网络请求失败的情况 测试
                 if (NetUtils.isConnected(getApplicationContext())) {
                     mHandler.sendEmptyMessage(-1);
                 } else {
